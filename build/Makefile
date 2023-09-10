@@ -1,7 +1,7 @@
 VPATH=../src:../tests
 
 DEBUG=-DDEBUG -g
-CXXFLAGS=-Wall -O3 -std=c++11 $(DEBUG)
+CXXFLAGS=-Wall -O3 -std=c++11 -fPIC $(DEBUG)
 LDFLAGS=
 CC=gcc
 CXX=g++
@@ -25,7 +25,7 @@ default: $(OBJECTS)
 	   $(LDFLAGS)
 
 lib: $(OBJECTS)
-	$(CXX) -o ../libparsemid.so ../src/parsemid.cpp -fPIC -shared \
+	$(CXX) -o ../libparse_mid.so -fPIC -shared \
 	   $(OBJECTS) \
 	   $(CXXFLAGS) \
 	   $(LDFLAGS)

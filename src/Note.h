@@ -24,6 +24,14 @@ public:
   void dump();
 
 private:
+  struct NoteTable
+  {
+    const char *name;
+    float frequency;
+  };
+
+  static NoteTable note_table[];
+
   int length;
   bool is_on;
   int channel;
