@@ -41,10 +41,20 @@ int Header::read(FILE *in)
 void Header::dump()
 {
   printf(" -- MThd ---\n");
-  printf("   header: %d\n", length);
+  printf("   length: %d\n", length);
   printf("   format: %d\n", format);
   printf("   tracks: %d\n", tracks);
   printf(" division: %d\n", division);
   printf("\n");
+}
+
+void Header::dump_as_json()
+{
+  printf("  \"header\": {\n");
+  printf("     \"length\": %d,\n", length);
+  printf("     \"format\": %d,\n", format);
+  printf("     \"tracks\": %d,\n", tracks);
+  printf("     \"division\": %d\n", division);
+  printf("  },\n");
 }
 

@@ -14,11 +14,21 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "MetaEvent.h"
 #include "Midi.h"
 
 Midi::Midi() :
-  in     { nullptr }
+  tempo           { 500000 },
+  division_usecs  { 0 },
+  in              { nullptr }
 {
+  memset(time_signature, 0, sizeof(time_signature));
+  memset(key_signature, 0, sizeof(key_signature));
+
+  time_signature[0] = 4;
+  time_signature[1] = 4;
+
+  division_usecs = tempo / 100;
 }
 
 Midi::~Midi()
@@ -46,6 +56,7 @@ int Midi::open_file(const char *filename)
 
   header.read(in);
 
+  set_division(header.division);
   tracks.reserve(header.tracks);
 
   for (int n = 0; n < header.tracks; n++) { tracks.emplace_back(); }
@@ -74,7 +85,31 @@ int Midi::open_file(const char *filename)
       printf("Error: Unknown chunk '%.4s'\n", type);
       return -4;
     }
+  }
 
+  bool tempo_set = false;
+  bool time_signature_set = false;
+  bool key_signature_set = false;
+
+  for (auto &track : tracks)
+  {
+    if (track.has_tempo() && tempo_set == false)
+    {
+      set_tempo(track.get_tempo());
+      tempo_set = true;
+    }
+
+    if (track.has_time_signature() && time_signature_set == false)
+    {
+      track.get_time_signature(time_signature);
+      time_signature_set = true;
+    }
+
+    if (track.has_key_signature() && key_signature_set == false)
+    {
+      track.get_key_signature(key_signature);
+      key_signature_set = true;
+    }
   }
 
   return 0;
@@ -89,6 +124,16 @@ void Midi::close_file()
 void Midi::dump_header()
 {
   header.dump();
+
+  printf("           tempo: %d\n", tempo);
+  printf("  time_signature: %d/%d  cc=%d bb=%d\n",
+    time_signature[0],
+    time_signature[1],
+    time_signature[2],
+    time_signature[3]);
+  printf("   key_signature: %s %s\n\n",
+    MetaEvent::get_key_signature(key_signature[0], key_signature[0] == 0),
+    key_signature[0] == 0 ? "Major" : "Minor");
 }
 
 void Midi::dump_tracks(bool show_bin, bool show_text)
@@ -103,11 +148,40 @@ void Midi::dump_tracks(bool show_bin, bool show_text)
   }
 }
 
+void Midi::dump_as_json()
+{
+  printf("{");
+  header.dump_as_json();
+
+  printf("  \"tracks\": [\n");
+
+  for (int n = 0; n < header.tracks; n++)
+  {
+    tracks[n].dump_as_json();
+    printf("%s", n == header.tracks - 1 ? "\n" : ",\n");
+  }
+
+  printf("  ]\n");
+  printf("}\n");
+}
+
 int Midi::read_chunk_type(char *type)
 {
   int length = fread(type, 1, 4, in);
   if (length != 4) { return -1; }
 
   return 0;
+}
+
+void Midi::set_division(int value)
+{
+  division = value;
+  set_tempo(tempo); 
+}
+
+void Midi::set_tempo(int value)
+{
+  tempo = value;
+  division_usecs = tempo / division;
 }
 

@@ -22,6 +22,7 @@ public:
 
   int set(uint8_t *data, int length);
   void dump();
+  void dump_as_json();
 
 private:
   struct NoteTable

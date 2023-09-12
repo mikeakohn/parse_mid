@@ -22,6 +22,7 @@ public:
 
   int read(FILE *in);
   void dump();
+  void dump_as_json();
 
   int length;
   int format;

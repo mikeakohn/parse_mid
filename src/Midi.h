@@ -32,11 +32,23 @@ public:
 
   void dump_header();
   void dump_tracks(bool show_bin, bool show_text);
+  void dump_as_json();
 
 private:
   int read_chunk_type(char *type);
+  void set_division(int value);
+  void set_tempo(int value);
 
   Header header;
+
+  // These come from MetaEvents in different tracks. Each track can
+  // have its own value.
+  int tempo;
+  uint8_t time_signature[4];
+  uint8_t key_signature[2];
+  useconds_t division_usecs;
+
+  int division;
 
   FILE *in;
   std::vector<Track> tracks;

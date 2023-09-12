@@ -18,8 +18,11 @@ class MetaEvent
 {
 public:
 
-  static int dump(uint8_t *data);
   static int get_length(uint8_t *data);
+  static int dump(uint8_t *data);
+  static int dump_as_json(uint8_t *data, int vlength);
+
+  static const char *get_key_signature(int value, bool is_major);
 
   enum
   {
@@ -46,6 +49,7 @@ private:
 
   static int text_length(uint8_t *data);
   static int text_event(uint8_t *data, const char *label);
+  static int text_event_as_json(uint8_t *data, const char *label);
   static int print_string(uint8_t *data);
 };
 

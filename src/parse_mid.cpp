@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
   Midi midi;
   bool show_bin = false;
   bool show_text = false;
+  bool as_json = false;
   const char *filename = nullptr;
 
   for (int n = 1; n < argc; n++)
@@ -37,6 +38,11 @@ int main(int argc, char *argv[])
         show_text = true;
       }
         else
+      if (strcmp(argv[n], "-json") == 0)
+      {
+        as_json = true;
+      }
+        else
       {
         printf("Error: Unknown option %s.\n", argv[n]);
         exit(1);
@@ -50,7 +56,11 @@ int main(int argc, char *argv[])
 
   if (filename == nullptr)
   {
-    printf("Usage: %s [ -bin -text ] <file.mid>\n", argv[0]);
+    printf("Usage: %s [ options ] <file.mid>\n", argv[0]);
+    printf(
+      "    -bin         (Show tracks as hexdump)\n"
+      "    -text        (Show tracks as text)\n"
+      "    -json        (Show output in JSON format)\n");
     exit(0);
   }
 
@@ -60,8 +70,17 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  midi.dump_header();
-  midi.dump_tracks(show_bin, show_text);
+
+  if (as_json)
+  {
+    midi.dump_as_json();
+  }
+    else
+  {
+    midi.dump_header();
+    midi.dump_tracks(show_bin, show_text);
+  }
+
   midi.close_file();
 
   return 0;

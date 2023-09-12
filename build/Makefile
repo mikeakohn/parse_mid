@@ -1,7 +1,8 @@
 VPATH=../src:../tests
 
 DEBUG=-DDEBUG -g
-CXXFLAGS=-Wall -O3 -std=c++11 -fPIC $(DEBUG)
+#CXXFLAGS=-Wall -O3 -std=c++11 -fPIC $(DEBUG)
+CXXFLAGS=-Wall -std=c++11 -fPIC $(DEBUG)
 LDFLAGS=
 CC=gcc
 CXX=g++
@@ -12,7 +13,6 @@ OBJECTS= \
   file_io.o \
   ControlChange.o \
   Header.o \
-  MetaData.o \
   MetaEvent.o \
   Midi.o \
   Note.o \

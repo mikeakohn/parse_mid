@@ -43,15 +43,6 @@ int Note::set(uint8_t *data, int length)
 
 void Note::dump()
 {
-#if 0
-  printf("   note: { length=%d, is_on=%s, channel=%d, tone=%d velocity=%d }\n",
-    length,
-    is_on ? "true" : "false",
-    channel,
-    tone,
-    velocity);
-#endif
-
   int index = tone;
   if (index > 128) { index = 128; }
 
@@ -63,6 +54,16 @@ void Note::dump()
     tone,
     note_table[index].name,
     note_table[index].frequency);
+}
+
+void Note::dump_as_json()
+{
+  printf("        { \"type\": \"note\", length=%d, is_on=%s, channel=%d, tone=%d velocity=%d }",
+    length,
+    is_on ? "true" : "false",
+    channel,
+    tone,
+    velocity);
 }
 
 Note::NoteTable Note::note_table[] =
