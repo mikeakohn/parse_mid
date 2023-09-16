@@ -246,7 +246,7 @@ int MetaEvent::dump_as_json(uint8_t *data, int vlength)
       bytes += 6;
       break;
     case TYPE_TIME_SIGNATURE:
-      printf(" \"time_signature\", \"text\": \"%d/%d\", \"nn\": %d, \"dd\": %d, \"cc\": %02x \"bb\": %02x }",
+      printf(" \"time_signature\", \"text\": \"%d/%d\", \"nn\": %d, \"dd\": %d, \"cc\": %d, \"bb\": %d }",
         data[2],
         data[3],
         data[2],

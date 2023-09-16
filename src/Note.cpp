@@ -58,7 +58,7 @@ void Note::dump()
 
 void Note::dump_as_json()
 {
-  printf("        { \"type\": \"note\", length=%d, is_on=%s, channel=%d, tone=%d velocity=%d }",
+  printf("        { \"type\": \"note\", \"length\": %d, \"is_on\": %s, \"channel\": %d, \"tone\": %d, \"velocity\": %d }",
     length,
     is_on ? "true" : "false",
     channel,

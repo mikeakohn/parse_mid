@@ -125,7 +125,7 @@ void Midi::dump_header()
 {
   header.dump();
 
-  printf("           tempo: %d\n", tempo);
+  printf("  starting_tempo: %d\n", tempo);
   printf("  time_signature: %d/%d  cc=%d bb=%d\n",
     time_signature[0],
     time_signature[1],
@@ -153,6 +153,7 @@ void Midi::dump_as_json()
   printf("{");
   header.dump_as_json();
 
+  printf("  \"starting_tempo\": %d,\n", tempo);
   printf("  \"tracks\": [\n");
 
   for (int n = 0; n < header.tracks; n++)

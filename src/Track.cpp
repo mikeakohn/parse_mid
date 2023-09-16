@@ -249,7 +249,7 @@ void Track::dump_as_json()
       else
     if (upper == 0xa0)
     {
-      printf("        { \"type\": \"polyphonic_key_pressure\": vlength=%d, channel=%d, value=%d }",
+      printf("        { \"type\": \"polyphonic_key_pressure\": \"vlength\": %d, \"channel\": %d, \"value\": %d }",
         vlength,
         type & 0xf,
         data[ptr++]);
@@ -257,14 +257,14 @@ void Track::dump_as_json()
       else
     if (upper == 0xb0)
     {
-      printf("        { \"type\": \"control_change\", vlength=%d, channel=%d }",
+      printf("        { \"type\": \"control_change\", \"vlength\": %d, \"channel\": %d }",
         vlength, type & 0xf);
       ptr += 2;
     }
       else
     if (upper == 0xc0)
     {
-      printf("        { \"type\": \"program_change\", vlength=%d, channel=%d, program_number=%d }",
+      printf("        { \"type\": \"program_change\", \"vlength\": %d, \"channel\": %d, \"program_number\": %d }",
         vlength,
         type & 0xf,
         data[ptr++]);
@@ -272,7 +272,7 @@ void Track::dump_as_json()
       else
     if (upper == 0xd0)
     {
-      printf("        { \"type\": \"channel_pressure\", vlength=%d, channel=%d, value=%d }",
+      printf("        { \"type\": \"channel_pressure\", \"vlength\": %d, \"channel\": %d, \"value\": %d }",
         vlength,
         type & 0xf,
         data[ptr++]);
@@ -280,7 +280,7 @@ void Track::dump_as_json()
       else
     if (upper == 0xe0)
     {
-      printf("        { \"type\": \"pitch_wheel_change\", vlength=%d, channel=%d, value=%d }",
+      printf("        { \"type\": \"pitch_wheel_change\", \"vlength\": %d, \"channel\": %d, \"value\": %d }",
         vlength,
         type & 0xf,
         data[0] | (data[1] << 7));
@@ -305,6 +305,7 @@ void Track::process()
   if (data == nullptr) { return; }
 
   int ptr = 0;
+  int vtime = 0;
 
   while (ptr < length)
   {
@@ -312,6 +313,7 @@ void Track::process()
     int count;
     int vlength = get_vlength(data + ptr, count);
 
+    vtime += vlength;
     ptr += count;
 
     int type = data[ptr++];
@@ -329,7 +331,10 @@ void Track::process()
           name = std::string((char *)(data + ptr + 1 + count), vlength);
           break;
         case MetaEvent::TYPE_TEMPO:
-          tempo_offset = ptr;
+          if (vtime == 0)
+          {
+            tempo_offset = ptr;
+          }
           break;
         case MetaEvent::TYPE_TIME_SIGNATURE:
           time_signature_offset = ptr;
