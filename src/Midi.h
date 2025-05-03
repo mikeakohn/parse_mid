@@ -34,6 +34,24 @@ public:
   void dump_tracks(bool show_bin, bool show_text);
   void dump_as_json();
 
+  int get_track_count()    { return header.tracks; }
+  int get_division_count() { return header.division; }
+  int get_tempo()          { return tempo; }
+
+  uint8_t *get_track_data(int index)
+  {
+    if (index >= (int)tracks.size()) { return nullptr; }
+
+    return tracks[index].get_track_data();
+  }
+
+  Track &get_track(int index)
+  {
+    if (index >= (int)tracks.size()) { index = 0; }
+
+    return tracks[index];
+  }
+
 private:
   int read_chunk_type(char *type);
   void set_division(int value);

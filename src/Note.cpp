@@ -17,11 +17,11 @@
 #include "Note.h"
 
 Note::Note() :
-  length   { 0 },
   is_on    { false },
   channel  { 0 },
   tone     { 0 },
-  velocity { 0 }
+  velocity { 0 },
+  length   { 0 }
 {
 }
 

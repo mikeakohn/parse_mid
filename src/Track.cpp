@@ -300,6 +300,112 @@ void Track::dump_as_json()
   printf("    }");
 }
 
+bool Track::iterator::next()
+{
+  if (ptr >= length) { return false; }
+
+  Note note;
+  int count;
+
+  vlength = get_vlength(data + ptr, count);
+  is_note = false;
+  ptr += count;
+
+  type = data[ptr++];
+
+  int upper = type & 0xf0;
+
+  if (type == 0xff)
+  {
+    printf("  MetaEvent: vlength=%d", vlength);
+    int count = MetaEvent::dump(data + ptr);
+
+    if (count == -1)
+    {
+      printf("Error: Unknown meta event %02x\n", data[ptr - 1]);
+      exit(1);
+      //return false;
+    }
+
+    ptr += count;
+  }
+    else
+  if (type == 0xf0 || type == 0xf7)
+  {
+    printf("  system_exclusive: [\n");
+    for (int n = 0; n < vlength; n++)
+    {
+      printf(" %02x,", data[ptr++]);
+      if (((n + 1 ) % 16) == 0) { printf("\n"); }
+    }
+    printf("  ]\n\n");
+  }
+    else
+  if (upper == 0xa0)
+  {
+    printf("   PolyphonicKeyPressure: vlength=%d channel=%d value=%d\n",
+      vlength,
+      type & 0xf,
+      data[ptr++]);
+  }
+    else
+  if (upper == 0xb0)
+  {
+    printf("   ControlChange: vlength=%d channel=%d ", vlength, type & 0xf);
+    ptr += ControlChange::dump(data);
+  }
+    else
+  if (upper == 0xc0)
+  {
+    printf("   ProgramChange: vlength=%d channel=%d program_number=%d\n",
+      vlength,
+      type & 0xf,
+      data[ptr++]);
+  }
+    else
+  if (upper == 0xd0)
+  {
+    printf("   ChannelPressure: vlength=%d channel=%d value=%d\n",
+      vlength,
+      type & 0xf,
+    data[ptr++]);
+  }
+    else
+  if (upper == 0xe0)
+  {
+    printf("   PitchWheelChange: vlength=%d channel=%d value=%d\n",
+      vlength,
+      type & 0xf,
+      data[0] | (data[1] << 7));
+    ptr += 2;
+  }
+    else
+  {
+    is_note = true;
+
+    raw_data.data = data + ptr - 1;
+    raw_data.count = note.set(data + ptr - 1, vlength);
+
+    ptr += raw_data.count;
+  }
+
+  return true;
+}
+
+Track::iterator Track::iterator::operator ++()
+{
+  next();
+
+  return *this;
+}
+
+Track::iterator Track::iterator::operator ++(int inc)
+{
+  next();
+
+  return *this;
+}
+
 void Track::process()
 {
   if (data == nullptr) { return; }

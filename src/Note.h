@@ -24,6 +24,11 @@ public:
   void dump();
   void dump_as_json();
 
+  bool is_on;
+  int channel;
+  int tone;
+  int velocity;
+
 private:
   struct NoteTable
   {
@@ -34,10 +39,6 @@ private:
   static NoteTable note_table[];
 
   int length;
-  bool is_on;
-  int channel;
-  int tone;
-  int velocity;
 };
 
 #endif

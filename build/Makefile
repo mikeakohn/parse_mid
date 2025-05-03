@@ -21,14 +21,14 @@ OBJECTS= \
 default: $(OBJECTS)
 	$(CXX) -o ../parse_mid ../src/parse_mid.cpp \
 	   $(OBJECTS) \
-	   $(CXXFLAGS) \
-	   $(LDFLAGS)
+	   $(CXXFLAGS) $(LDFLAGS)
 
 lib: $(OBJECTS)
 	$(CXX) -o ../libparse_mid.so -fPIC -shared \
 	   $(OBJECTS) \
-	   $(CXXFLAGS) \
-	   $(LDFLAGS)
+	   $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o ../play_mid ../src/play_mid.cpp -L.. -lparse_mid \
+	   $(CXXFLAGS)
 
 %.o: %.cpp %.h
 	$(CXX) -c $< -o $*.o $(CXXFLAGS)

@@ -1,4 +1,7 @@
+*.swp
 libparse_mid.so
 parse_mid
+play_mid
 *.o
+*.mid
 
