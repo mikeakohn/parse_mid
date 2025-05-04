@@ -18,6 +18,9 @@ OBJECTS= \
   Note.o \
   Track.o
 
+PLAYER_OBJECTS= \
+  Serial.o
+
 default: $(OBJECTS)
 	$(CXX) -o ../parse_mid ../src/parse_mid.cpp \
 	   $(OBJECTS) \
@@ -27,7 +30,10 @@ lib: $(OBJECTS)
 	$(CXX) -o ../libparse_mid.so -fPIC -shared \
 	   $(OBJECTS) \
 	   $(CXXFLAGS) $(LDFLAGS)
+
+player: lib $(PLAYER_OBJECTS)
 	$(CXX) -o ../play_mid ../src/play_mid.cpp -L.. -lparse_mid \
+	   $(PLAYER_OBJECTS) \
 	   $(CXXFLAGS)
 
 %.o: %.cpp %.h

@@ -19,11 +19,13 @@
 #include <vector>
 
 #include "Midi.h"
+#include "Serial.h"
 #include "Track.h"
 
 int main(int argc, char *argv[])
 {
   Midi midi;
+  Serial serial;
   const char *filename = nullptr;
   int channel = -1;
 
@@ -34,6 +36,18 @@ int main(int argc, char *argv[])
       if (strcmp(argv[n], "-channel") == 0)
       {
         channel = atoi(argv[++n]);
+      }
+        else
+      if (strcmp(argv[n], "-port") == 0)
+      {
+        const char *port = argv[++n];
+        int result = serial.open_port(port, 31250);
+
+        if (result != 0)
+        {
+          printf("Error: Could not open serial port %s.\n", port);
+          exit(-1);
+        }
       }
         else
       {
@@ -159,6 +173,11 @@ int main(int argc, char *argv[])
     }
   }
 #endif
+
+  if (serial.is_open())
+  {
+    serial.close_port();
+  }
 
   midi.close_file();
 
