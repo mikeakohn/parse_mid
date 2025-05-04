@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <unistd.h>
 
+#include <chrono>
 #include <vector>
 
 #include "Midi.h"
@@ -23,13 +25,15 @@ int main(int argc, char *argv[])
 {
   Midi midi;
   const char *filename = nullptr;
+  int channel = -1;
 
   for (int n = 1; n < argc; n++)
   {
     if (argv[n][0] == '-')
     {
-      if (strcmp(argv[n], "-json") == 0)
+      if (strcmp(argv[n], "-channel") == 0)
       {
+        channel = atoi(argv[++n]);
       }
         else
       {
@@ -57,6 +61,8 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  // tempo is microseconds per quarter note.
+  // divisions is divisions per quarter note.
   int track_count = midi.get_track_count();
   int divisions   = midi.get_division_count();
   int tempo       = midi.get_tempo();
@@ -66,22 +72,80 @@ int main(int argc, char *argv[])
   printf("    tempo: %d\n", tempo);
 
   std::vector<Track::iterator> track_data;
+  std::vector<int> ticks;
+
+  int count = 0;
 
   for (int n = 0; n < track_count; n++)
   {
+    if (channel != -1 && channel != n) { continue; }
+
     Track &track = midi.get_track(n);
     track_data.push_back(track.begin());
+    ticks.push_back(0);
+
+    count += 1;
+  }
+
+  int used;
+  int delay = tempo / divisions;
+
+  while (true)
+  {
+    used = 0;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int n = 0; n < count; n++)
+    {
+      if (!track_data[n].has_more_data()) { continue; }
+
+      used += 1;
+
+      // If anything is time of 0, run it and grab the next.
+      while (track_data[n].has_more_data())
+      {
+        if (ticks[n] == 0)
+        {
+          track_data[n]++;
+
+          if (track_data[n].is_note == false) { continue; }
+
+          const int vlength = track_data[n].vlength;
+
+          printf("%d: %02x %02x %02x (%d)\n",
+            n,
+            track_data[n].raw_data.data[0],
+            track_data[n].raw_data.data[1],
+            track_data[n].raw_data.data[2],
+            vlength);
+
+          if (vlength == 0) { continue; }
+
+          ticks[n] = vlength;
+        }
+
+        ticks[n] -= 1;
+
+        break;
+      }
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto delta = end - start;
+
+    auto microseconds =
+      std::chrono::duration_cast<std::chrono::microseconds>(delta).count();
+
+    int current = delay - microseconds;
+
+    if (current > 0) { usleep(current); }
+
+    if (used == 0) { break; }
   }
 
 #if 0
-  track_data[0]++;
-
-  //if (track_data[0] != track.end())
-  {
-    printf("%d\n", track_data[0].is_note);
-  }
-
-  Track &track = midi.get_track(2);
+  Track &track = midi.get_track(0);
 
   for (auto it : track)
   {

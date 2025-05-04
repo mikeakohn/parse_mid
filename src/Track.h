@@ -60,6 +60,7 @@ public:
     }
 
     bool next();
+    bool has_more_data() { return ptr < length; }
 
     iterator operator ++();
     iterator operator ++(int inc);
