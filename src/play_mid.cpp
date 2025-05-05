@@ -134,6 +134,11 @@ int main(int argc, char *argv[])
             track_data[n].raw_data.data[2],
             vlength);
 
+          if (serial.is_open())
+          {
+            serial.send_bytes(track_data[n].raw_data.data, 3);
+          }
+
           if (vlength == 0) { continue; }
 
           ticks[n] = vlength;
