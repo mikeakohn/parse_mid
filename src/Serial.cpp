@@ -30,7 +30,7 @@ Serial::~Serial()
 
 int Serial::open_port(const char *device, int baud)
 {
-  fd = open(device, O_RDWR | O_NOCTTY);
+  fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
 
   if (fd == -1)
   {
@@ -42,8 +42,12 @@ int Serial::open_port(const char *device, int baud)
 
   tcgetattr(fd, &oldtio); 
 
+  // For MIDI 31250 baud:
+  // setserial -a -g /dev/ttyUSB0
+  // setserial -v /dev/ttyUSB0 spd_cust divisor 768
+
   memset(&newtio, 0, sizeof(struct termios));
-  newtio.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+  newtio.c_cflag = B38400 | CS8 | CLOCAL | CREAD;
   newtio.c_iflag = IGNPAR;
   newtio.c_oflag = 0;
   newtio.c_lflag = 0;
@@ -52,7 +56,6 @@ int Serial::open_port(const char *device, int baud)
 
   tcflush(fd, TCIFLUSH);
   tcsetattr(fd, TCSANOW, &newtio);
-
 
   return 0;
 }

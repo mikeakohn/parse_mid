@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
           printf("Error: Could not open serial port %s.\n", port);
           exit(-1);
         }
+
+        printf("Opened serial port %s.\n", port);
       }
         else
       {
@@ -80,7 +82,7 @@ int main(int argc, char *argv[])
   int track_count = midi.get_track_count();
   int divisions   = midi.get_division_count();
   int tempo       = midi.get_tempo();
- 
+
   printf("   tracks: %d\n", track_count);
   printf("divisions: %d\n", divisions);
   printf("    tempo: %d\n", tempo);
@@ -103,6 +105,30 @@ int main(int argc, char *argv[])
 
   int used;
   int delay = tempo / divisions;
+
+  // Extra commands for SAM2695.
+  if (serial.is_open())
+  {
+    uint8_t set_volume[] =
+    {
+      0xb0, 0x63, 0x37,
+      0xb0, 0x62, 0x07,
+      0xb0, 0x06, 0x7f
+    };
+
+    serial.send_bytes(set_volume, 9);
+
+#if 0
+    uint8_t auto_test[] =
+    {
+      0xb0, 0x63, 0x37,
+      0xb0, 0x62, 0x51,
+      0xb0, 0x06, 0x23
+    };
+
+    serial.send_bytes(auto_test, 9);
+#endif
+  }
 
   while (true)
   {
@@ -136,6 +162,16 @@ int main(int argc, char *argv[])
 
           if (serial.is_open())
           {
+#if 0
+            uint8_t data[4];
+            data[0] = track_data[n].raw_data.data[0];
+            data[1] = track_data[n].raw_data.data[1];
+            data[2] = track_data[n].raw_data.data[2];
+            data[3] = 0;
+
+            serial.send_bytes(data, 4);
+#endif
+
             serial.send_bytes(track_data[n].raw_data.data, 3);
           }
 
