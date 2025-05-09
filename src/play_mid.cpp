@@ -154,8 +154,12 @@ int main(int argc, char *argv[])
 
           if (track_data[n].is_note == false)
           {
-            tempo = track_data[n].new_tempo;
-            division_delay = tempo / divisions;
+            if (track_data[n].new_tempo != -1)
+            {
+              tempo = track_data[n].new_tempo;
+              division_delay = tempo / divisions;
+            }
+
             continue;
           }
 
