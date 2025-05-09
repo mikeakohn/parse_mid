@@ -307,6 +307,8 @@ bool Track::iterator::next()
   Note note;
   int count;
 
+  new_tempo = -1;
+
   vlength = get_vlength(data + ptr, count);
   is_note = false;
   ptr += count;
@@ -325,6 +327,14 @@ bool Track::iterator::next()
       printf("Error: Unknown meta event %02x\n", data[ptr - 1]);
       exit(1);
       //return false;
+    }
+
+    if (data[ptr] == MetaEvent::TYPE_TEMPO)
+    {
+      new_tempo =
+        (data[ptr + 2] << 16) |
+        (data[ptr + 3] << 8) |
+        (data[ptr + 4]);
     }
 
     ptr += count;

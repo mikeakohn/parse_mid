@@ -103,8 +103,10 @@ int main(int argc, char *argv[])
     count += 1;
   }
 
+  // used keeps track if a track is still valid.
+  // delay is microseconds per division.
   int used;
-  int delay = tempo / divisions;
+  int division_delay = tempo / divisions;
 
   // Extra commands for SAM2695.
   if (serial.is_open())
@@ -130,11 +132,12 @@ int main(int argc, char *argv[])
 #endif
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
+  uint64_t actual_delta = 0;
+
   while (true)
   {
     used = 0;
-
-    auto start = std::chrono::high_resolution_clock::now();
 
     for (int n = 0; n < count; n++)
     {
@@ -149,7 +152,12 @@ int main(int argc, char *argv[])
         {
           track_data[n]++;
 
-          if (track_data[n].is_note == false) { continue; }
+          if (track_data[n].is_note == false)
+          {
+            tempo = track_data[n].new_tempo;
+            division_delay = tempo / divisions;
+            continue;
+          }
 
           const int vlength = track_data[n].vlength;
 
@@ -186,15 +194,16 @@ int main(int argc, char *argv[])
       }
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto delta = end - start;
+    actual_delta += division_delay;
 
-    auto microseconds =
+    auto now = std::chrono::high_resolution_clock::now();
+    auto delta = now - start;
+
+    auto time_delta =
       std::chrono::duration_cast<std::chrono::microseconds>(delta).count();
 
-    int current = delay - microseconds;
-
-    if (current > 0) { usleep(current); }
+    int time_delay = actual_delta - time_delta;
+    if (time_delay > 0) { usleep(time_delay); }
 
     if (used == 0) { break; }
   }
