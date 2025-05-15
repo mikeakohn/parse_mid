@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         channel = atoi(argv[++n]);
       }
         else
-      if (strcmp(argv[n], "-port") == 0)
+      if (strcmp(argv[n], "-port") == 0 || strcmp(argv[n], "-p") == 0)
       {
         const char *port = argv[++n];
         int result = serial.open_port(port, 31250);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
   {
     printf("Usage: %s [ options ] <file.mid>\n", argv[0]);
     printf(
-      "    -json        (Show output in JSON format)\n");
+      "    -port <device>     (Open serial port, ex. /dev/ttyUSB0)\n");
     exit(0);
   }
 
@@ -86,6 +86,11 @@ int main(int argc, char *argv[])
   printf("   tracks: %d\n", track_count);
   printf("divisions: %d\n", divisions);
   printf("    tempo: %d\n", tempo);
+
+  if (serial.is_open())
+  {
+    printf(" *** No serial / hardware MIDI device opened ***\n");
+  }
 
   std::vector<Track::iterator> track_data;
   std::vector<int> ticks;
