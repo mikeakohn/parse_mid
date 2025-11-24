@@ -46,13 +46,13 @@ public:
   {
   public:
     iterator(uint8_t *data, int length) :
-       is_note   { 0 },
-       ptr       { 0 },
-       length    { length },
-       vlength   { 0 },
-       type      { 0 },
-       new_tempo { -1 },
-       data      { data }
+      is_note   { 0 },
+      ptr       { 0 },
+      length    { length },
+      vlength   { 0 },
+      type      { 0 },
+      new_tempo { -1 },
+      data      { data }
     {
     }
 

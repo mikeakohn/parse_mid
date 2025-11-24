@@ -21,13 +21,13 @@
 #include "Track.h"
 
 Track::Track() :
-  length                 { 0  },
-  file_offset            { 0  },
-  tempo_offset           { -1 },
-  time_signature_offset  { -1 },
-  key_signature_offset   { -1 },
-  data                   { nullptr },
-  ptr                    { 0  }
+  length                { 0  },
+  file_offset           { 0  },
+  tempo_offset          { -1 },
+  time_signature_offset { -1 },
+  key_signature_offset  { -1 },
+  data                  { nullptr },
+  ptr                   { 0  }
 {
 }
 
@@ -39,8 +39,9 @@ Track::~Track()
 int Track::read(FILE *in)
 {
   file_offset = (int)ftell(in) - 4;
-  length = read_int32(in);
-  data = (uint8_t *)malloc(length);
+  length      = read_int32(in);
+  data        = (uint8_t *)malloc(length);
+
   int n = fread(data, 1, length, in);
 
   if (n != length) { return -1; }
@@ -84,7 +85,7 @@ void Track::get_key_signature(uint8_t *value)
 
 void Track::dump_header()
 {
-  printf(" -- MThd ---\n");
+  printf(" -- MTrk ---\n");
   printf("            name: %s\n", name.c_str());
   printf("          length: %d\n", length);
   printf("     file_offset: %d\n", file_offset);
